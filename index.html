@@ -234,29 +234,43 @@ function updateDropdowns() {
         nav(next);
     }
 
-    function finish() {
-        const name = document.getElementById('playerName').value;
-        const champ = document.getElementById('champ').value;
-        const runup = document.getElementById('runup').value;
-        const third = document.getElementById('third').value;
-        const fourth = document.getElementById('fourth').value;
-        
-        // Construct the CSV string
-		const csv = `Name, ${name}\n` +
-					`Selection R32, ${state[2].join('|')}\n` +
-					`Round of 16, ${state[3].join('|')}\n` +
-					`Quarter Finals, ${state[4].join('|')}\n` +
-					`Semi-Finals, ${state[5].join('|')}\n` +
-					`Champion, ${champ}\n` +
-					`Runner-Up, ${runup}\n` +
-					`3rd Place, ${third}\n` +
-					`4th Place, ${fourth}`;
-                
-        const a = document.createElement('a');
-        a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-        a.download = `${new Date().getTime()}_${name}.csv`;
-        a.click();
+async function finish() {
+    const name = document.getElementById('playerName').value;
+    // ... (rest of your variables)
+    
+    // 1. Construct the CSV string
+    const csvContent = `Name, ${name}\n...`; // your CSV structure
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const file = new File([blob], `${new Date().getTime()}_${name}.csv`, { type: 'text/csv' });
+
+    // 2. Attempt to trigger native mobile/browser sharing
+    if (navigator.share && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                title: 'World Cup Pool Entry',
+                text: `Hi Jeff, here is my World Cup pool entry for ${name}.`,
+                files: [file]
+            });
+        } catch (err) {
+            console.error('Sharing failed', err);
+            // Fallback: Trigger download if sharing fails
+            downloadFile(blob, file.name);
+        }
+    } else {
+        // Fallback for desktop browsers that don't support sharing files
+        downloadFile(blob, file.name);
+        alert("Please save the file and send it to Jeff via WhatsApp or your preferred messaging app.");
     }
+}
+
+// Helper to trigger manual download
+function downloadFile(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+}
     
 function showSummary() {
     const buildGrid = (items, cols) => {

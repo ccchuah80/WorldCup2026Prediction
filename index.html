@@ -138,10 +138,14 @@ Note: n represents the number of players sharing the specific prize tier.”.<br
     </div>
 
 <div id="s7" class="section">
-    <div id="summaryGrid" style="display: grid; grid-template-columns: 1fr; gap: 15px;"></div>
-    <button class="btn-back" style="flex:1;" onclick="nav(6)">Back</button>
-    <button class="btn-next" style="background:#007bff;" onclick="window.print()">Save to PDF</button>
-    <button class="btn-next" style="flex:1;" onclick="finish()">Confirm & Save</button>
+    <div id="summaryGrid" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 15px;"></div>
+    
+    <!-- New centered button container -->
+    <div style="display: flex; justify-content: center; gap: 10px; width: 100%;">
+        <button class="btn-back" style="flex:1; max-width: 150px;" onclick="nav(6)">Back</button>
+        <button class="btn-next" style="background:#007bff; flex:1; max-width: 150px;" onclick="window.print()">Save to PDF</button>
+        <button class="btn-next" style="flex:1; max-width: 150px;" onclick="finish()">Confirm & Share</button>
+    </div>
 </div>
 
 <script>

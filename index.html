@@ -4,86 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WC 2026 Pool</title>
-    <style>
-        body { font-family: sans-serif; padding: 1px; background: #f4f4f9; }
-        .section { display: none; background: white; padding: 15px; border-radius: 10px; }
-        .active { display: block; }
-        button { width: 48%; padding: 15px; margin-top: 15px; border: none; border-radius: 8px; font-weight: bold; }
-        .btn-next { background: #28a745; color: white; }
-        .btn-back { background: #6c757d; color: white; }
-        .counter { font-weight: bold; color: #d9534f; margin: 10px 0; }
-        .group { background: #333; color: white; padding: 5px; margin-top: 15px; }
-        label { display: block; padding: 8px 0; border-bottom: 1px solid #eee; }
-    </style>
+<style>
+    body { font-family: sans-serif; padding: 0; background: #f4f4f9; margin: 0; }
+    .header-sticky {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 10px 0;
+    border-bottom: 2px solid #ddd;
+    z-index: 1000;
+    margin-bottom: 10px;
+}
+.row {
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 10px;
+}
+
+    .section { display: none; padding: 20px; }
+    .active { display: block; }
+    button { padding: 10px 15px; font-size:1rem; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    .btn-next { background: #28a745; color: white; }
+    .btn-back { background: #6c757d; color: white; }
+    .counter { font-size: 0.8rem; font-weight: bold; color: #d9534f; }
+    .group { background: #333; color: white; padding: 5px; margin-top: 15px; }
+    label { display: block; padding: 8px 0; border-bottom: 1px solid #eee; }
+    #rulesBox { background: #fff; padding: 12px; margin: 15px; border: 1px solid #ccc; font-size: 0.8rem; line-height: 1.4; border-radius: 8px; }
+</style>
 </head>
 <body>
 
-    <div id="s1" class="section active">
-        <h1>World Cup 2026 【Pick-32】</h1>
-        <input type="text" id="playerName" placeholder="Your Name" style="width:100%; padding:10px; box-sizing:border-box;">
-        <button class="btn-next" style="width:100%" onclick="if(document.getElementById('playerName').value) nav(2)">Start Pool</button>
+<div id="s1" class="section active">
+    <h1><center>⚽️ World Cup 2026 ⚽️<br>[Pick-32]</center></h1>
+    <input type="text" id="playerName" placeholder="Your Name" style="width:100%; padding:10px; font-size: 1rem; box-sizing:border-box;">
+    <button class="btn-next" style="width:100%" onclick="if(document.getElementById('playerName').value) nav(2)">Start Pool</button>
+    <div id="rulesBox">
+        <h3><u>World Cup 2026 "Pick 32" Pool Rules:</h3></u>
+        1. <b>Selection & Deadline:</b> Pick 32 countries. Bracket prediction required. Deadline: June 18, 2026.<br>
+        2. <b>Scoring:</b> R32(1), R16(2), QF(4), SF(7), 3rd(11), Runner-up(8), Champion(17).<br>
+        3. <b>Tie-Breaker:</b> Champion > Finalist > Semi > QF > R32.<br>
+        4. <b>Prize:</b> <br>&emsp;&emsp;Standard distribution: 50% / 30% / 20%.<br>
+	        &emsp;&emsp;1st & 2nd place equal: 40% / 40% / 20%
+<br>&emsp;&emsp;2nd & 3rd place equal: 50% / 25% / 25%
+<br>&emsp;&emsp;1st, 2nd, 3rd (or more): (100% / n)
+<br>&emsp;&emsp;1st place holds, 2nd–4th (or more) equal: 50% / (50% /n)<br>
+Note: n represents the number of players sharing the specific prize tier.”.<br><br><br><br>
+	        hosted by Jeff. the Buzzzzzz
     </div>
+    <button style="width:100%" onclick="localStorage.clear(); location.reload();">Reset All Progress</button>
 
-<div id="s2" class="section">
-    <h3>Pick 32 Teams</h3>
-    <div id="c2" class="counter">Selected: 0 | Left: 32</div>
-    <div id="grid2"></div>
-<button class="btn-next" style="background:#ffc107;" onclick="quickFill(2, 32)">Auto Fill 32</button>    <button class="btn-next" onclick="validate(2,3,32)">Next</button>
 </div>
 
-    <div id="s3" class="section">
-        <h3>Round of 16</h3>
-        <div id="c3" class="counter">Selected: 0 | Left: 16</div>
-        <div id="grid3"></div>
-        <button class="btn-back" onclick="nav(2)">Back</button>
-        <button class="btn-next" style="background:#ffc107;" onclick="quickFill(3, 16)">Auto Fill 16</button>
+	<div id="s2" class="section">
+		<div class="header-sticky">
+			<div class="row" style="justify-content: space-between; align-items: center;">
+				<h2 style="margin:0;">Group Stage [Pick 32]</h2>
+				<div id="c2" class="counter" style="margin:0;">Selected: 0 | Left: 32</div>
+			</div>
+			<div class="row">
+				<button class="btn-back" style="flex:1;" onclick="nav(1)">Back</button>
+				<button class="btn-next" style="flex:1; background:#ffc107; color:black;" onclick="quickFill(2, 32)">Lucky Pick</button>
+				<button class="btn-next" style="flex:1;" onclick="validate(2,3,32)">Next</button>
+			</div>
+		</div>
+	
+		<div id="grid2"></div>
+	</div>
 
-        <button class="btn-next" onclick="validate(3,4,16)">Next</button>
-    </div>
 
-    <div id="s4" class="section">
-        <h3>Quarter Finals</h3>
-        <div id="c4" class="counter">Selected: 0 | Left: 8</div>
-        <div id="grid4"></div>
-        <button class="btn-back" onclick="nav(3)">Back</button>
-        <button class="btn-next" style="background:#ffc107;" onclick="quickFill(4, 8)">Auto Fill 8</button>
-        <button class="btn-next" onclick="validate(4,5,8)">Next</button>
-    </div>
+	<div id="s3" class="section">
+		<div class="header-sticky">
+			<div class="row" style="justify-content: space-between; align-items: center;">
+				<h2 style="margin:0;">Stage of 32 [Pick 16]</h2>
+				<div id="c3" class="counter" style="margin:0;">Selected: 0 | Left: 16</div>
+			</div>
+			<div class="row">
+				<button class="btn-back" style="flex:1;" onclick="nav(2)">Back</button>
+				<button class="btn-next" style="flex:1; background:#ffc107; color:black;" onclick="quickFill(3, 16)">Lucky Pick</button>
+				<button class="btn-next" style="flex:1;" onclick="validate(3,4,16)">Next</button>
+			</div>
+		</div>	
+		<div id="grid3"></div>
+	</div>
 
+	<div id="s4" class="section">
+		<div class="header-sticky">
+			<div class="row" style="justify-content: space-between; align-items: center;">
+				<h2 style="margin:0;">Stage of 16 [Pick 8]</h2>
+				<div id="c4" class="counter" style="margin:0;">Selected: 0 | Left: 8</div>
+			</div>
+			<div class="row">
+				<button class="btn-back" style="flex:1;" onclick="nav(3)">Back</button>
+				<button class="btn-next" style="flex:1; background:#ffc107; color:black;" onclick="quickFill(4, 8)">Lucky Pick</button>
+				<button class="btn-next" style="flex:1;" onclick="validate(4,5,8)">Next</button>
+			</div>
+		</div>	
+		<div id="grid4"></div>
+	</div>
+	
     <div id="s5" class="section">
-        <h3>Semi Finals (Pick 4)</h3>
-        <div id="c5" class="counter">Selected: 0 | Left: 4</div>
-        <div id="grid5"></div>
-        <button class="btn-back" onclick="nav(4)">Back</button>
-        <button class="btn-next" style="background:#ffc107;" onclick="quickFill(5, 4)">Auto Fill 4</button>
-        <button class="btn-next" onclick="validate(5,6,4)">Next</button>
-    </div>
+		<div class="header-sticky">
+			<div class="row" style="justify-content: space-between; align-items: center;">
+				<h2 style="margin:0;">Quarter Final [Pick 4]</h2>
+				<div id="c5" class="counter" style="margin:0;">Selected: 0 | Left: 4</div>
+			</div>
+			<div class="row">
+				<button class="btn-back" style="flex:1;" onclick="nav(4)">Back</button>
+				<button class="btn-next" style="flex:1; background:#ffc107; color:black;" onclick="quickFill(5, 4)">Lucky Pick</button>
+				<button class="btn-next" style="flex:1;" onclick="validate(5,6,4)">Next</button>
+			</div>
+		</div>	
+		<div id="grid5"></div>
+	</div>
 
     <div id="s6" class="section">
-        <h3>Final Stage</h3>
-        Champion: <select id="champ"></select>
-        Runner Up: <select id="runup"></select>
-        3rd Place: <select id="third"></select>
-        4th Place: <select id="fourth"></select>
-        <button class="btn-back" onclick="nav(5)">Back</button>
-        <button class="btn-next" onclick="showSummary()">Next</button>
+        <div class="header-sticky">
+			<div class="row" style="justify-content: space-between; align-items: center;">
+				<h2 style="margin:0;">Semi Final - Final</h2>
+			</div>
+			<div class="row">
+		        <button class="btn-back" style="flex:1;" onclick="nav(5)">Back</button>
+		        <button class="btn-next" style="flex:1;" onclick="showSummary()">Next</button>
+			</div>
+		</div>
+		
+		<h2>Final Ranking</h2>
+        <br>Champion: <select id="champ" style="height: 40px;"></select>
+        <br>Runner Up: <select id="runup" style="height: 40px;"></select>
+        <br>3rd Place: <select id="third" style="height: 40px;"></select>
+        <br>4th Place: <select id="fourth" style="height: 40px;"></select>
+        <br>
+       
     </div>
 
 <div id="s7" class="section">
-    <div id="summaryGrid" style="display: grid; grid-template-columns: 1fr; gap: 2px;"></div>
-    <button class="btn-back" onclick="nav(6)">Back</button>
-    <button class="btn-next" onclick="finish()">Confirm & Download</button>
+    <div id="summaryGrid" style="display: grid; grid-template-columns: 1fr; gap: 15px;"></div>
+    <button class="btn-back" style="flex:1;" onclick="nav(6)">Back</button>
+    <button class="btn-next" style="background:#007bff;" onclick="window.print()">Save to PDF</button>
+    <button class="btn-next" style="flex:1;" onclick="finish()">Confirm & Save</button>
 </div>
+
 <script>
     
     const groups = {
-        "Group A": ["🇲🇽 Mexico", "🇿🇦 South Africa", "🇰🇷 South Korea", "🇨🇿 Czechia"],
-        "Group B": ["🇨🇦 Canada", "🇧🇦 Bosnia, BiH", "🇶🇦 Qatar", "🇨🇭 Switzerland"],
+        "Group A": ["🇲🇽 Mexico", "🇿🇦 S. Africa", "🇰🇷 S. Korea", "🇨🇿 Czechia"],
+        "Group B": ["🇨🇦 Canada", "🇧🇦 Bosnia", "🇶🇦 Qatar", "🇨🇭 Switzerland"],
         "Group C": ["🇧🇷 Brazil", "🇲🇦 Morocco", "🇭🇹 Haiti", "🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland"],
-        "Group D": ["🇺🇸 United States", "🇵🇾 Paraguay", "🇦🇺 Australia", "🇹🇷 Turkiye"],
+        "Group D": ["🇺🇸 U.S.A.", "🇵🇾 Paraguay", "🇦🇺 Australia", "🇹🇷 Turkiye"],
         "Group E": ["🇩🇪 Germany", "🇨🇼 Curacao", "🇨🇮 Ivory Coast", "🇪🇨 Ecuador"],
         "Group F": ["🇳🇱 Netherlands", "🇯🇵 Japan", "🇸🇪 Sweden", "🇹🇳 Tunisia"],
-        "Group G": ["🇧🇪 Belgium", "🇪🇬 Egypt", "🇮🇷 Iran", "🇳🇿 New Zealand"],
+        "Group G": ["🇧🇪 Belgium", "🇪🇬 Egypt", "🇮🇷 Iran", "🇳🇿 N. Zealand"],
         "Group H": ["🇪🇸 Spain", "🇨🇻 Cape Verde", "🇸🇦 Saudi Arabia", "🇺🇾 Uruguay"],
         "Group I": ["🇫🇷 France", "🇸🇳 Senegal", "🇮🇶 Iraq", "🇳🇴 Norway"],
         "Group J": ["🇦🇷 Argentina", "🇩🇿 Algeria", "🇦🇹 Austria", "🇯🇴 Jordan"],
@@ -134,12 +204,14 @@ function updateDropdowns() {
             }
         });
     });
+    saveData(); // Added
 }
 
     function update(s, limit) {
         const checked = Array.from(document.querySelectorAll('.s'+s+':checked')).map(i => i.value);
         state[s] = checked;
         document.getElementById('c'+s).innerText = `Selected: ${checked.length} | Left: ${limit-checked.length}`;
+        saveData(); // Added
     }
 
      function validate(s, next, limit) {
@@ -170,13 +242,16 @@ function updateDropdowns() {
         const fourth = document.getElementById('fourth').value;
         
         // Construct the CSV string
-        const csv = `Name, ${name}\n` +
-                    `Selection, ${state[2].join('|')}\n` +
-                    `Champion, ${champ}\n` +
-                    `Runner-Up, ${runup}\n` +
-                    `3rd Place, ${third}\n` +
-                    `4th Place, ${fourth}`;
-        
+		const csv = `Name, ${name}\n` +
+					`Selection R32, ${state[2].join('|')}\n` +
+					`Round of 16, ${state[3].join('|')}\n` +
+					`Quarter Finals, ${state[4].join('|')}\n` +
+					`Semi-Finals, ${state[5].join('|')}\n` +
+					`Champion, ${champ}\n` +
+					`Runner-Up, ${runup}\n` +
+					`3rd Place, ${third}\n` +
+					`4th Place, ${fourth}`;
+                
         const a = document.createElement('a');
         a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
         a.download = `${new Date().getTime()}_${name}.csv`;
@@ -184,60 +259,57 @@ function updateDropdowns() {
     }
     
 function showSummary() {
-    // Helper to build a grid of items with smaller font
     const buildGrid = (items, cols) => {
-        // Sort by extracting the text AFTER the emoji
-        // This splits the string by space and takes the part after the flag
+        // Sort ignoring the flag emoji
         let sortedItems = [...items].sort((a, b) => {
             let nameA = a.split(' ').slice(1).join(' ').toLowerCase();
             let nameB = b.split(' ').slice(1).join(' ').toLowerCase();
             return nameA.localeCompare(nameB);
         });
         
-        let html = `<div style="display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: 5px;">`;
+        let html = `<div style="display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: 2px;">`;
         sortedItems.forEach(item => {
-            html += `<div style="border: 1px solid #ddd; padding: 5px; font-size: 11px; text-align: center;">${item}</div>`;
+            html += `<div style="border: 1px solid #eee; padding: 5px; font-size: 12px; text-align: center;">${item}</div>`;
         });
         return html + `</div>`;
     };
 
     const playerName = document.getElementById('playerName').value;
     
-    // Create Final Podium Grid (2x2)
+    // Podium 2x2 Grid (remains as requested)
     const podiumGrid = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-            <div style="font-size: 11px;">🏆 Champ: ${document.getElementById('champ').value}</div>
-            <div style="font-size: 11px;">🥈 Runner: ${document.getElementById('runup').value}</div>
-            <div style="font-size: 11px;">🥉 3rd: ${document.getElementById('third').value}</div>
-            <div style="font-size: 11px;">🏅 4th: ${document.getElementById('fourth').value}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+            <div style="font-size: 12px;">🏆 Champion: ${document.getElementById('champ').value}</div>
+            <div style="font-size: 12px;">🥈 Runner-up: ${document.getElementById('runup').value}</div>
+            <div style="font-size: 12px;">🥉 3rd Placing: ${document.getElementById('third').value}</div>
+            <div style="font-size: 12px;">🏅 4th Placing: ${document.getElementById('fourth').value}</div>
         </div>`;
 
+    // SF object removed from this array
     const stages = [
-        { title: "R32 Selection", content: buildGrid([...state[2]].sort(), 4) },
+        { title: "R32", content: buildGrid(state[2], 4) },
         { title: "R16", content: buildGrid(state[3], 4) },
         { title: "QF", content: buildGrid(state[4], 4) },
-        { title: "SF", content: buildGrid(state[5], 2) },
         { title: "Final Podium", content: podiumGrid }
     ];
 
     const grid = document.getElementById('summaryGrid');
-    grid.innerHTML = `<h4 style="margin: 5px 0;">World Cup 2026 Prediction by ${playerName}</h4>`; 
+    grid.innerHTML = `<h4 style="margin: 0 0 5px 0;">World Cup 2026 Prediction by ${playerName}</h4>`; 
     
     stages.forEach(s => {
         let box = document.createElement('div');
         box.style.border = "1px solid #ccc";
-        box.style.padding = "5px"; // Reduced padding
+        box.style.padding = "5px";
         box.style.borderRadius = "4px";
         box.style.backgroundColor = "#fff";
-        box.innerHTML = `<strong style="font-size: 11px;">${s.title}</strong><hr style="margin:2px 0;">${s.content}`;
+        box.style.margin = "0"; 
+        
+        box.innerHTML = `<strong style="font-size: 10px; display:block; margin-bottom:2px;">${s.title}</strong>${s.content}`;
         grid.appendChild(box);
     });
 
     nav(7);
-}    
-    
-    
-    
+}   
     
     function quickFill(s, limit) {
     // 1. Get all checkboxes/options for the current section
@@ -267,6 +339,52 @@ function showSummary() {
     update(2, 32);
 }
 
+    // Save state whenever progress changes
+    function saveData() {
+        const data = {
+            state: state,
+            playerName: document.getElementById('playerName').value,
+            champ: document.getElementById('champ').value,
+            runup: document.getElementById('runup').value,
+            third: document.getElementById('third').value,
+            fourth: document.getElementById('fourth').value
+        };
+        localStorage.setItem('wc2026_pool_data', JSON.stringify(data));
+    }
+
+    // Load state on page refresh
+    function loadData() {
+        const saved = localStorage.getItem('wc2026_pool_data');
+        if (!saved) return;
+        
+        const data = JSON.parse(saved);
+        state = data.state;
+        document.getElementById('playerName').value = data.playerName || "";
+
+        // Restore checkboxes
+        Object.keys(state).forEach(s => {
+            state[s].forEach(team => {
+                const checkbox = document.querySelector(`.s${s}[value="${team}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+            // Update counter text
+            const counter = document.getElementById('c' + s);
+            if (counter) counter.innerText = `Selected: ${state[s].length} | Left: ${(s==2?32:s==3?16:s==4?8:4)-state[s].length}`;
+        });
+
+        // Restore dropdowns if they exist
+        if (data.champ) {
+            setupFinalStage(); // Ensure dropdowns are populated first
+            document.getElementById('champ').value = data.champ;
+            document.getElementById('runup').value = data.runup;
+            document.getElementById('third').value = data.third;
+            document.getElementById('fourth').value = data.fourth;
+        }
+    }
+
+    // Call loadData at the end of the script
+    loadData();
+    
 </script>
 </body>
 </html>

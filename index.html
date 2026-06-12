@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <title>WC 2026 Pool</title>
 <style>
     body { font-family: sans-serif; padding: 0; background: #f4f4f9; margin: 0; }
@@ -37,7 +38,7 @@
 <div id="s1" class="section active">
     <h1><center>⚽️ World Cup 2026 ⚽️<br>[Pick-32]</center></h1>
     <input type="text" id="playerName" placeholder="Your Name" style="width:100%; padding:10px; font-size: 1rem; box-sizing:border-box;">
-    <button class="btn-next" style="width:100%" onclick="if(document.getElementById('playerName').value) nav(2)">Start Pool</button>
+    <button class="btn-next" style="width:100%" onclick="if(document.getElementById('playerName').value) nav(2)">Click here to Start</button>
     <div id="rulesBox">
         <h3><u>World Cup 2026 "Pick 32" Pool Rules:</h3></u>
         1. <b>Selection & Deadline:</b> Pick 32 countries. Bracket prediction required. Deadline: June 18, 2026.<br>
@@ -48,7 +49,7 @@
 <br>&emsp;&emsp;2nd & 3rd place equal: 50% / 25% / 25%
 <br>&emsp;&emsp;1st, 2nd, 3rd (or more): (100% / n)
 <br>&emsp;&emsp;1st place holds, 2nd–4th (or more) equal: 50% / (50% /n)<br>
-Note: n represents the number of players sharing the specific prize tier.”.<br><br><br><br>
+Note: n represents the number of players sharing the specific prize tier.<br><br><br><br>
 	        hosted by Jeff. the Buzzzzzz
     </div>
     <button style="width:100%" onclick="localStorage.clear(); location.reload();">Reset All Progress</button>
@@ -143,8 +144,7 @@ Note: n represents the number of players sharing the specific prize tier.”.<br
     <!-- New centered button container -->
     <div style="display: flex; justify-content: center; gap: 10px; width: 100%;">
         <button class="btn-back" style="flex:1; max-width: 150px;" onclick="nav(6)">Back</button>
-        <button class="btn-next" style="background:#007bff; flex:1; max-width: 150px;" onclick="window.print()">Save to PDF</button>
-        <button class="btn-next" style="flex:1; max-width: 150px;" onclick="finish()">Confirm & Share</button>
+<button class="btn-next" style="background:#007bff; flex:1; max-width: 150px;" onclick="printToPdf()">Save to PDF</button>
     </div>
 </div>
 
@@ -172,12 +172,22 @@ Note: n represents the number of players sharing the specific prize tier.”.<br
         document.getElementById('s' + n).style.display = 'block';
     }
 
-    // Initialization
-    const grid2 = document.getElementById('grid2');
-    for(let g in groups) {
-        grid2.innerHTML += `<div class="group">${g}</div>`;
-        groups[g].forEach(t => grid2.innerHTML += `<label><input type="checkbox" class="s2" value="${t}" onchange="update(2,32)"> ${t}</label>`);
-    }
+
+// Initialization
+const grid2 = document.getElementById('grid2');
+for(let g in groups) {
+    // Replace space with hyphen to make it a valid class name
+    const groupClass = g.replace(' ', '-'); 
+    grid2.innerHTML += `<div class="group">${g}</div>`;
+    // Add a container with the unique class (e.g., Group-A)
+    grid2.innerHTML += `<div class="${groupClass}">`;
+    
+    groups[g].forEach(t => {
+        grid2.innerHTML += `<label><input type="checkbox" class="s2" value="${t}" onchange="update(2,32)"> ${t}</label>`;
+    });
+    
+    grid2.innerHTML += `</div>`;
+}
 
 // Add this to your script
 function setupFinalStage() {
@@ -238,77 +248,46 @@ function updateDropdowns() {
         nav(next);
     }
 
-async function finish() {
-    const name = document.getElementById('playerName').value;
-    // ... (rest of your variables)
-    
-    // 1. Construct the CSV string
-    const csvContent = `Name, ${name}\n...`; // your CSV structure
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const file = new File([blob], `${new Date().getTime()}_${name}.csv`, { type: 'text/csv' });
-
-    // 2. Attempt to trigger native mobile/browser sharing
-    if (navigator.share && navigator.canShare({ files: [file] })) {
-        try {
-            await navigator.share({
-                title: 'World Cup Pool Entry',
-                text: `Hi Jeff, here is my World Cup pool entry for ${name}.`,
-                files: [file]
-            });
-        } catch (err) {
-            console.error('Sharing failed', err);
-            // Fallback: Trigger download if sharing fails
-            downloadFile(blob, file.name);
-        }
-    } else {
-        // Fallback for desktop browsers that don't support sharing files
-        downloadFile(blob, file.name);
-        alert("Please save the file and send it to Jeff via WhatsApp or your preferred messaging app.");
-    }
-}
-
-// Helper to trigger manual download
-function downloadFile(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-}
-    
 function showSummary() {
     const buildGrid = (items, cols) => {
-        // Sort ignoring the flag emoji
         let sortedItems = [...items].sort((a, b) => {
             let nameA = a.split(' ').slice(1).join(' ').toLowerCase();
             let nameB = b.split(' ').slice(1).join(' ').toLowerCase();
             return nameA.localeCompare(nameB);
         });
         
-        let html = `<div style="display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: 2px;">`;
+        let html = `<div style="display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: 1px;">`;
         sortedItems.forEach(item => {
-            html += `<div style="border: 1px solid #eee; padding: 5px; font-size: 12px; text-align: center;">${item}</div>`;
+            html += `<div style="border: 1px solid #eee; padding: 3px; font-size: 12px; text-align: center;">${item}</div>`;
         });
         return html + `</div>`;
     };
 
     const playerName = document.getElementById('playerName').value;
     
-    // Podium 2x2 Grid (remains as requested)
-    const podiumGrid = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-            <div style="font-size: 12px;">🏆 Champion: ${document.getElementById('champ').value}</div>
-            <div style="font-size: 12px;">🥈 Runner-up: ${document.getElementById('runup').value}</div>
-            <div style="font-size: 12px;">🥉 3rd Placing: ${document.getElementById('third').value}</div>
-            <div style="font-size: 12px;">🏅 4th Placing: ${document.getElementById('fourth').value}</div>
-        </div>`;
+    // Updated Podium: Added wrapper div to match the other boxes, centered font, and clear structure
+    // Updated Podium: Bold labels, country in same row, centered
+	const podiumGrid = `
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; text-align: center; padding: 10px;">
+			<div style="font-size: 12px; border: 1px solid #ccc; padding: 5px; borderradius:4px">
+				<b>🏆Champion:</b> ${document.getElementById('champ').value}
+			</div>
+			<div style="font-size: 12px; border: 1px solid #ccc; padding: 5px; borderradius:4px">
+				<b>🥈Runner-up:</b> ${document.getElementById('runup').value}
+			</div>
+			<div style="font-size: 12px; border: 1px solid #ccc; padding: 5px; borderradius:4px">
+				<b>🥉3rd Place:</b> ${document.getElementById('third').value}
+			</div>
+			<div style="font-size: 12px; border: 1px solid #ccc; padding: 5px; borderradius:4px">
+				<b>🏅4th Place:</b> ${document.getElementById('fourth').value}
+			</div>
+		</div>`;
 
-    // SF object removed from this array
     const stages = [
         { title: "R32", content: buildGrid(state[2], 4) },
         { title: "R16", content: buildGrid(state[3], 4) },
         { title: "QF", content: buildGrid(state[4], 4) },
-        { title: "Final Podium", content: podiumGrid }
+        { title: "Final Podium", content: podiumGrid } // This now gets styled automatically by the loop below
     ];
 
     const grid = document.getElementById('summaryGrid');
@@ -322,40 +301,66 @@ function showSummary() {
         box.style.backgroundColor = "#fff";
         box.style.margin = "0"; 
         
-        box.innerHTML = `<strong style="font-size: 10px; display:block; margin-bottom:2px;">${s.title}</strong>${s.content}`;
+        // This loop applies the same border/box styling to the Podium just like the other stages
+        box.innerHTML = `<strong style="font-size: 10px; display:block; margin-bottom:2px; text-align:center;">${s.title}</strong>${s.content}`;
         grid.appendChild(box);
     });
 
     nav(7);
-}   
-    
-    function quickFill(s, limit) {
-    // 1. Get all checkboxes/options for the current section
-    const options = document.querySelectorAll('.s' + s);
-    
-    // 2. Clear previous
-    options.forEach(o => o.checked = false);
-    
-    // 3. Randomly check 'limit' number of items
-    let shuffled = Array.from(options).sort(() => 0.5 - Math.random());
-    shuffled.slice(0, limit).forEach(o => o.checked = true);
-    
-    // 4. Update the counter
-    update(s, limit);
 }
+    
+function quickFill(s, limit) {
+    if (s !== 2) {
+        // Other stages: random pick normally
+        const options = document.querySelectorAll('.s' + s);
+        options.forEach(o => o.checked = false);
 
-    function quickPick() {
-    const checkboxes = document.querySelectorAll('.s2');
-    // Uncheck all first
-    checkboxes.forEach(cb => cb.checked = false);
-    
-    // Randomly select 32
-    let shuffled = Array.from(checkboxes).sort(() => 0.5 - Math.random());
-    shuffled.slice(0, 32).forEach(cb => cb.checked = true);
-    
-    // Update counter
+        const shuffled = [...options].sort(() => Math.random() - 0.5);
+        shuffled.slice(0, limit).forEach(o => o.checked = true);
+
+        update(s, limit);
+        return;
+    }
+
+    // ===== Stage 2 Lucky Pick (Pick 32) =====
+    document.querySelectorAll('.s2').forEach(cb => cb.checked = false);
+
+    const groupNames = Object.keys(groups);
+
+    // Randomly choose 8 groups to receive 3 teams
+    const groupsWithThree = [...groupNames]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 8);
+
+    groupNames.forEach(groupName => {
+        const teams = groups[groupName];
+
+        // Find checkbox DOM elements for this group
+        const checkboxes = teams.map(team =>
+            document.querySelector(`.s2[value="${team}"]`)
+        ).filter(Boolean);
+
+        if (checkboxes.length !== 4) {
+            console.log("Group missing checkboxes:", groupName);
+            return;
+        }
+
+        // Shuffle team order
+        const shuffled = [...checkboxes].sort(() => Math.random() - 0.5);
+
+        // Pick first 2
+        shuffled[0].checked = true;
+        shuffled[1].checked = true;
+
+        // If selected group gets 3 teams, pick one more from remaining two
+        if (groupsWithThree.includes(groupName)) {
+            shuffled[2].checked = true;
+        }
+    });
+
     update(2, 32);
 }
+
 
     // Save state whenever progress changes
     function saveData() {
@@ -369,7 +374,26 @@ function showSummary() {
         };
         localStorage.setItem('wc2026_pool_data', JSON.stringify(data));
     }
-
+function printToPdf() {
+    // Get the name directly from the input field
+    const nameInput = document.getElementById('playerName').value;
+    // Fallback to "Player" if the input is empty
+    const playerName = nameInput ? nameInput.replace(/\s+/g, '_') : "Player";
+    
+    // Store original title to revert later
+    const originalTitle = document.title;
+    
+    // Set the title so the browser suggests this as the PDF filename
+    document.title = `WC2026_by_${playerName}`;
+    
+    // Trigger print
+    window.print();
+    
+    // Revert title after a delay
+    setTimeout(() => {
+        document.title = originalTitle;
+    }, 1000);
+}
     // Load state on page refresh
     function loadData() {
         const saved = localStorage.getItem('wc2026_pool_data');

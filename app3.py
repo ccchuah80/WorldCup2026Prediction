@@ -17,7 +17,6 @@ st.markdown("""
     /* Keep hiding the Hamburger Menu */
     #MainMenu {visibility: hidden !important;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
     [data-testid="stAppViewContainer"] { background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
     h1, h2, h3, h4, p, div, span, label { color: #000000 !important; }

@@ -1,0 +1,6 @@
+[theme]
+base = "light"
+primaryColor = "#66ccff" # Optional: Matches your current app theme
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#000000"

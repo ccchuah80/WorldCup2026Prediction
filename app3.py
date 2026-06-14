@@ -10,10 +10,15 @@ st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] { background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
     h1, h2, h3, h4, p, div, span, label { color: #000000 !important; }
-    .country-box { display: inline-block; min-width: 100px; width: auto; padding: 4px 6px; margin: 2px; border: 1px solid #ddd; border-radius: 5px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; color: black; white-space: nowrap; }
+    .country-box { display: inline-block; min-width: 85px; width: auto; padding: 2px 4px; margin: 2px; border: 1px solid #ddd; border-radius: 5px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; color: black; white-space: nowrap; }
     .correct { background-color: #90EE90 !important; border-color: #228B22 !important; }
     .stMarkdown p { margin: 2px 0 !important; }
     h3 { margin-bottom: 2px !important; padding-bottom: 0px !important; color: black !important; }
+    /* Hide the 'Made with Streamlit' footer */
+    footer {visibility: hidden;}
+    
+    /* Optional: If you also want to hide the hamburger menu */
+    #MainMenu {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 

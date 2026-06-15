@@ -27,7 +27,7 @@ st.markdown("""
     /* Styling for the tables to make them stand out from the gradient background */
     [data-testid="stTable"] {
         background-color: #ffffff !important;
-        border-radius: 10px !important;
+        border-radius: 5px !important;
         padding: 10px !important;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }

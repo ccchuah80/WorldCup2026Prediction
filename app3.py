@@ -165,7 +165,7 @@ if selected_player:
     st.sidebar.metric("Total Points", total_score)
     
 # 8. Leaderboard
-st.header("🏆 Result/Score Standing")
+st.header("🏆 Score Standing")
 leaderboard = []
 
 for player in player_list:

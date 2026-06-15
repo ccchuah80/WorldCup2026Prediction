@@ -28,7 +28,7 @@ st.markdown("""
     [data-testid="stTable"] {
         background-color: #ffffff !important;
         border-radius: 5px !important;
-        padding: 10px !important;
+        padding: 5px !important;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 

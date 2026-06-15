@@ -207,9 +207,9 @@ for player in player_list:
 # Create and display the table
 df_leaderboard = pd.DataFrame(leaderboard).sort_values(by="Total Points", ascending=False).reset_index(drop=True)
 
-# Limit to top 8 players
-df_leaderboard_top8 = df_leaderboard.head(8)
-st.table(df_leaderboard_top8)
+# Limit to top 5 players
+df_leaderboard_top5 = df_leaderboard.head(8)
+st.table(df_leaderboard_top5)
 # st.table(df_leaderboard)
 
 if st.button("Refresh Data"):

@@ -267,10 +267,7 @@ with st.container(border=True):
     with col4:
         st.metric("Quarter-Finalist", get_most_guessed("QF"))
         
-
 st.markdown('</div>', unsafe_allow_html=True)
-
-st.divider()
 
 if st.button("Refresh Data"):
     st.cache_data.clear()

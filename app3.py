@@ -114,7 +114,12 @@ def get_all_data():
 st.title("⚽ World Cup 2026 Predictions")
 raw_data, raw_results = get_all_data()
 
+# Check if data exists
+if not raw_data:
+    st.warning("No prediction data found! It looks like the tournament has not started. Check back once predictions are in.")
+    st.stop() # Stops execution here so the rest of the page doesn't try to load
 # Robust check to prevent KeyError
+
 if raw_data is None or len(raw_data) == 0:
     st.info("Loading data from database...")
     st.stop() # Wait for data before continuing

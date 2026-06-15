@@ -24,6 +24,26 @@ st.markdown("""
     .correct { background-color: #90EE90 !important; border-color: #228B22 !important; }
     .stMarkdown p { margin: 2px 0 !important; }
     h3 { margin-bottom: 2px !important; padding-bottom: 0px !important; color: black !important; }
+    /* Styling for the tables to make them stand out from the gradient background */
+    [data-testid="stTable"] {
+        background-color: #ffffff !important;
+        border-radius: 10px !important;
+        padding: 10px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Target the table header for better readability */
+    thead tr th {
+        background-color: #f0f2f6 !important;
+        color: #333 !important;
+        font-weight: bold !important;
+    }
+
+    /* Ensure table rows have a clean, non-transparent look */
+    tbody tr td {
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #eee !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 

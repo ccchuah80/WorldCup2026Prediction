@@ -122,6 +122,9 @@ if not raw_data:
 
 if raw_data is None or len(raw_data) == 0:
     st.info("Loading data from database...")
+    if st.button("Refresh Data"):
+        st.cache_data.clear()
+        st.rerun()
     st.stop() # Wait for data before continuing
 
 # Process Data safely

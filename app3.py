@@ -8,6 +8,22 @@ st.set_page_config(page_title="World Cup 2026", initial_sidebar_state="expanded"
 # 2. Styling (CSS)
 st.markdown("""
     <style>
+    /* Force the header container to have a visible background */
+    [data-testid="stHeader"] {
+        background-color: rgba(255, 255, 255, 0.5) !important; /* Semi-transparent grey/white */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Force the sidebar toggle button icon to be black for better visibility */
+    button[kind="header"] {
+        color: #000000 !important;
+    }
+    
+    /* Ensure the mobile menu/sidebar toggle is always visible */
+    [data-testid="stSidebarCollapseButton"] {
+        color: #000000 !important;
+    }
+    
     /* Force Hide the 'Made with Streamlit' footer */
     footer, [data-testid="stDecoration"], [data-testid="stStatusWidget"], .viewerBadge_container__1QSob, .styles_viewerBadge__1yB5_ {
         visibility: hidden !important;

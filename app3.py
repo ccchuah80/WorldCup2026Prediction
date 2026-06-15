@@ -50,9 +50,26 @@ def get_all_data():
 st.title("⚽ World Cup 2026 Predictions")
 raw_data, raw_results = get_all_data()
 
-# Process Data
-flat_data = [{"Player": e.get("participants", {}).get("user_name", "Unknown"), "Round": e.get("round"), "Country": e.get("country")} for e in raw_data]
-df = pd.DataFrame(flat_data)
+# Robust check to prevent KeyError
+if raw_data is None or len(raw_data) == 0:
+    st.info("Loading data from database...")
+    st.stop() # Wait for data before continuing
+
+# Process Data safely
+try:
+    flat_data = [{"Player": e.get("participants", {}).get("user_name", "Unknown"), 
+                  "Round": e.get("round"), 
+                  "Country": e.get("country")} for e in raw_data]
+    df = pd.DataFrame(flat_data)
+    
+    # Double-check that columns exist before proceeding
+    if "Player" not in df.columns:
+        st.error("Data structure mismatch. Please check your Supabase table schema.")
+        st.stop()
+        
+except Exception as e:
+    st.error(f"Error processing data: {e}")
+    st.stop()
 
 results_map = {}
 for entry in raw_results:

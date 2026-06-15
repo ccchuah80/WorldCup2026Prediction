@@ -24,6 +24,11 @@ st.markdown("""
         color: #000000 !important;
     }
     
+    /* Reduce gap between elements inside containers on mobile */
+    [data-testid="stVerticalBlock"] {
+        gap: 0.8rem !important;
+    }
+    
     /* Force Hide the 'Made with Streamlit' footer */
     footer, [data-testid="stDecoration"], [data-testid="stStatusWidget"], .viewerBadge_container__1QSob, .styles_viewerBadge__1yB5_ {
         visibility: hidden !important;
@@ -33,6 +38,26 @@ st.markdown("""
     /* Keep hiding the Hamburger Menu */
     #MainMenu {visibility: hidden !important;}
     footer {visibility: hidden;}
+    
+    /* Add this to your style block */
+    .popular-picks-container {
+    background-color: #ffffff !important;
+    }
+    
+    /* This targets the metric value text specifically to stop it from being huge */
+    [data-testid="stMetricValue"] {
+        font-size: 18px !important;
+        background-color: #ffffff !important;
+        padding: 5px !important;
+        border-radius: 10px !important;
+        border: 1px solid #e0e0e0 !important;
+        margin-bottom: 8px;
+    }
+    
+    /* This targets the metric label */
+    [data-testid="stMetricLabel"] {
+        font-size: 16px !important;
+    }
     
     [data-testid="stAppViewContainer"] { background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
     h1, h2, h3, h4, p, div, span, label { color: #000000 !important; }
@@ -53,12 +78,15 @@ st.markdown("""
         background-color: #f0f2f6 !important;
         color: #333 !important;
         font-weight: bold !important;
+        text-align: center !important; /* Corrected property */
     }
 
     /* Ensure table rows have a clean, non-transparent look */
     tbody tr td {
         background-color: #ffffff !important;
         border-bottom: 1px solid #eee !important;
+        padding-left: 20px !important; /* Adds space from the left margin */
+        padding-right: 30px !important; /* Adds space from the left margin */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -208,9 +236,41 @@ for player in player_list:
 df_leaderboard = pd.DataFrame(leaderboard).sort_values(by="Total Points", ascending=False).reset_index(drop=True)
 
 # Limit to top 5 players
-df_leaderboard_top5 = df_leaderboard.head(8)
+df_leaderboard_top5 = df_leaderboard.head(5)
 st.table(df_leaderboard_top5)
 # st.table(df_leaderboard)
+
+# --- Additional Insights ---
+def get_most_guessed(round_name):
+    round_data = df[df["Round"].str.upper() == round_name.upper()]
+    if not round_data.empty:
+        # Get count of each country
+        counts = round_data["Country"].value_counts()
+        # Filter to keep only those that match the maximum count
+        max_count = counts.max()
+        top_countries = counts[counts == max_count]
+        
+        # Return format: "Country (Count)" or "Country, Country (Count)"
+        return f"{', '.join(top_countries.index)} ({max_count})"
+    return "No predictions"
+
+with st.container(border=True):
+    st.markdown("### 📊 Popular Picks")
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Champion", get_most_guessed("CHAMPION"))
+    with col2:
+        st.metric("RunnerUp", get_most_guessed("RUNNERUP"))
+    with col3:
+        st.metric("Semi-Finalist", get_most_guessed("SF"))
+    with col4:
+        st.metric("Quarter-Finalist", get_most_guessed("QF"))
+        
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.divider()
 
 if st.button("Refresh Data"):
     st.cache_data.clear()

@@ -43,11 +43,14 @@
 	    margin: 20px auto; 
 	    display: block;
 	}
-	@media print {
+
     /* This hides the widget from the printed PDF */
-    #widget-al4imqhxitd1 {
-        display: none !important;
-    }
+	@media print {
+    	#widget-al4imqhxitd1, .header-reference-text {
+        	display: none !important;
+    	}
+	}
+
 }
 </style>
 </head>
@@ -165,8 +168,17 @@ Note: n represents the number of players sharing the specific prize tier.<br><br
 <button class="btn-next" style="background:#007bff; flex:1; max-width: 150px;" onclick="printToPdf()">Save to PDF</button>
     </div>
 </div>
-<div id="widget-al4imqhxitd1" class="scoreaxis-widget" style="width: 360px;height: 350px;font-size: 12px;background-color: #ffffff;color: #141416;border: 1px solid;border-color: #ecf1f7;overflow: auto;"><script src="https://widgets.scoreaxis.com/api/football/league-table/62322bfa75414360044d5ca4?widgetId=al4imqhxitd1&lang=en&teamLogo=1&tableLines=1&homeAway=0&header=1&position=1&goals=0&gamesCount=1&diff=0&winCount=1&drawCount=1&loseCount=1&lastGames=0&points=1&teamsLimit=all&links=1&font=heebo&fontSize=12&rowDensity=60&widgetWidth=360&widgetHeight=350&bodyColor=%23ffffff&textColor=%23141416&linkColor=%23141416&borderColor=%23ecf1f7&tabColor=%23f3f8fd" async></script><div class="widget-main-link" style="padding: 6px 12px;font-weight: 500;">Live data by <a href="https://www.scoreaxis.com/" style="color: inherit;">Scoreaxis</a></div></div>	
+<h4 style="text-align: center; font-style: italic; color: #555;">
+    For your reference to make predictions:
+</h4>
 
+<div id="widget-al4imqhxitd1" class="scoreaxis-widget" style="width: 360px; height: 350px; margin: 20px auto; display: block; font-size: 12px; background-color: #ffffff; color: #141416; border: 1px solid #ecf1f7; overflow: auto;">
+    <script src="https://widgets.scoreaxis.com/api/football/league-table/62322bfa75414360044d5ca4?widgetId=al4imqhxitd1&lang=en&teamLogo=1&tableLines=1&homeAway=0&header=1&position=1&goals=0&gamesCount=1&diff=0&winCount=1&drawCount=1&loseCount=1&lastGames=0&points=1&teamsLimit=all&links=1&font=heebo&fontSize=12&rowDensity=60&widgetWidth=360&widgetHeight=350&bodyColor=%23ffffff&textColor=%23141416&linkColor=%23141416&borderColor=%23ecf1f7&tabColor=%23f3f8fd" async></script>
+    <div class="widget-main-link" style="padding: 6px 12px; font-weight: 500;">
+        Live data by <a href="https://www.scoreaxis.com/" style="color: inherit;">Scoreaxis</a>
+    </div>
+</div>
+	
 <script>
     
     const groups = {

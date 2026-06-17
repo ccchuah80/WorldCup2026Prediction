@@ -199,10 +199,22 @@ Note: n represents the number of players sharing the specific prize tier.<br><br
     let state = { 2:[], 3:[], 4:[], 5:[],6:[],7:[] };
 
     function nav(n) {
-        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-        document.getElementById('s' + n).style.display = 'block';
-    }
-
+	    // 1. Hide all sections
+	    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+	    
+	    // 2. Show the target section
+	    document.getElementById('s' + n).style.display = 'block';
+	
+	    // 3. Toggle the widget visibility
+	    const widget = document.getElementById('widget-al4imqhxitd1');
+	    if (n === 7) {
+	        // Hide widget on Summary page (s7)
+	        widget.style.display = 'none';
+	    } else {
+	        // Show widget on all other pages
+	        widget.style.display = 'block'; 
+	    }
+	}
 
 // Initialization
 const grid2 = document.getElementById('grid2');

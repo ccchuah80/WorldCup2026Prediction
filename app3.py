@@ -59,8 +59,8 @@ st.markdown("""
         font-size: 16px !important;
     }
     
-    [data-testid="stAppViewContainer"] { background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
-    h1, h2, h3, h4, p, div, span, label { color: #000000 !important; }
+    [data-testid="stAppViewContainer"] { color: #000000 !important; background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
+    h1, h2, h3, h4, p, span, label { color: #000000 !important; }
     .country-box { display: inline-block; min-width: 85px; width: auto; padding: 2px 4px; margin: 2px; border: 1px solid #ddd; border-radius: 5px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; color: black; white-space: nowrap; }
     .correct { background-color: #90EE90 !important; border-color: #228B22 !important; }
     .stMarkdown p { margin: 2px 0 !important; }
@@ -113,6 +113,7 @@ def get_all_data():
 # 5. App Execution
 st.title("⚽ World Cup 2026 Predictions")
 raw_data, raw_results = get_all_data()
+
 
 # Check if data exists
 if not raw_data:
@@ -254,26 +255,28 @@ def get_most_guessed(round_name):
     if not round_data.empty:
         # Get count of each country
         counts = round_data["Country"].value_counts()
-        # Filter to keep only those that match the maximum count
-        max_count = counts.max()
-        top_countries = counts[counts == max_count]
         
-        # Return format: "Country (Count)" or "Country, Country (Count)"
-        return f"{', '.join(top_countries.index)} ({max_count})"
-    return "No predictions"
-
+        # Get the top 2 rows
+        top_2 = counts.head(3)
+        
+        # Format as "Country1 (Count), Country2 (Count)"
+        results = [f"{country} ({count})" for country, count in top_2.items()]
+        return "<br>".join(results)
+    return "No data"
+    
 with st.container(border=True):
     st.markdown("### 📊 Popular Picks")
     col1, col2, col3, col4 = st.columns(4)
     
+    # We use st.markdown instead of st.metric to allow the HTML line breaks
     with col1:
-        st.metric("Champion", get_most_guessed("CHAMPION"))
+        st.markdown(f"**Champion**<br>{get_most_guessed('CHAMPION')}", unsafe_allow_html=True)
     with col2:
-        st.metric("RunnerUp", get_most_guessed("RUNNERUP"))
+        st.markdown(f"**RunnerUp**<br>{get_most_guessed('RUNNERUP')}", unsafe_allow_html=True)
     with col3:
-        st.metric("Semi-Finalist", get_most_guessed("SF"))
+        st.markdown(f"**Semi-Finalist**<br>{get_most_guessed('SF')}", unsafe_allow_html=True)
     with col4:
-        st.metric("Quarter-Finalist", get_most_guessed("QF"))
+        st.markdown(f"**Quarter-Finalist**<br>{get_most_guessed('QF')}", unsafe_allow_html=True)
         
 st.markdown('</div>', unsafe_allow_html=True)
 

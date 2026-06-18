@@ -106,8 +106,11 @@ supabase = init_connection()
 
 @st.cache_data(ttl=600)
 def get_all_data():
-    preds = supabase.table("predictions").select("round, country, participants(user_name)").execute()
-    results = supabase.table("test_results").select("round, country").execute()
+    preds = supabase.table("predictions").select("round, country, participants(user_name)").limit(2000).execute()
+    
+    # If your test_results table is also large, consider adding it here too:
+    results = supabase.table("test_results").select("round, country").limit(2000).execute()
+    
     return preds.data, results.data
 
 # 5. App Execution

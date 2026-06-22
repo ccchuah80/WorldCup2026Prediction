@@ -38,12 +38,7 @@ st.markdown("""
     /* Keep hiding the Hamburger Menu */
     #MainMenu {visibility: hidden !important;}
     footer {visibility: hidden;}
-    
-    /* Add this to your style block */
-    .popular-picks-container {
-    background-color: #ffffff !important;
-    }
-    
+        
     /* This targets the metric value text specifically to stop it from being huge */
     [data-testid="stMetricValue"] {
         font-size: 18px !important;
@@ -60,11 +55,20 @@ st.markdown("""
     }
     
     [data-testid="stAppViewContainer"] { color: #000000 !important; background: linear-gradient(135deg, #66ccff, #ccffff) !important; background-attachment: fixed !important; }
+    
     h1, h2, h3, h4, p, span, label { color: #000000 !important; }
+    
     .country-box { display: inline-block; min-width: 85px; width: auto; padding: 2px 4px; margin: 2px; border: 1px solid #ddd; border-radius: 5px; text-align: center; background-color: #f9f9f9; font-size: 0.9em; color: black; white-space: nowrap; }
+    
     .correct { background-color: #90EE90 !important; border-color: #228B22 !important; }
+    
+    /* RED COLOR CLASSES FOR ELIMINATED/FAILED COUNTRIES */
+    .failed { background-color: #d9534f !important; border-color: #d91111 !important; color: #ffccff !important; }
+    
     .stMarkdown p { margin: 2px 0 !important; }
+    
     h3 { margin-bottom: 2px !important; padding-bottom: 0px !important; color: black !important; }
+    
     /* Styling for the tables to make them stand out from the gradient background */
     [data-testid="stTable"] {
         background-color: #faffb3 !important;
@@ -78,15 +82,15 @@ st.markdown("""
         background-color: #f0f2f6 !important;
         color: #333 !important;
         font-weight: bold !important;
-        text-align: center !important; /* Corrected property */
+        text-align: center !important;
     }
 
     /* Ensure table rows have a clean, non-transparent look */
     tbody tr td {
         background-color: #ffffff !important;
         border-bottom: 1px solid #eee !important;
-        padding-left: 20px !important; /* Adds space from the left margin */
-        padding-right: 30px !important; /* Adds space from the left margin */
+        padding-left: 20px !important;
+        padding-right: 30px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -106,17 +110,28 @@ supabase = init_connection()
 
 @st.cache_data(ttl=600)
 def get_all_data():
-    preds = supabase.table("predictions").select("round, country, participants(user_name)").limit(2000).execute()
+    preds = supabase.table("predictions") \
+        .select("round, country, participants(user_name)") \
+        .order("id") \
+        .limit(2000) \
+        .execute()
     
-    # If your test_results table is also large, consider adding it here too:
-    results = supabase.table("test_results").select("round, country").limit(2000).execute()
+    results = supabase.table("test_results") \
+        .select("round, country") \
+        .order("id") \
+        .limit(2000) \
+        .execute()
+        
+    # --- FETCH ELIMINATION STAGE DATA ---
+    elim_data = supabase.table("eliminated_teams") \
+        .select("country, eliminated_at_stage") \
+        .execute()
     
-    return preds.data, results.data
+    return preds.data, results.data, elim_data.data
 
 # 5. App Execution
 st.title("⚽ World Cup 2026 Predictions")
-raw_data, raw_results = get_all_data()
-
+raw_data, raw_results, raw_eliminated = get_all_data()
 
 # Check if data exists
 if not raw_data:
@@ -124,12 +139,11 @@ if not raw_data:
     if st.button("Refresh Data"):
         st.cache_data.clear()
         st.rerun()
-    st.stop() # Stops execution here so the rest of the page doesn't try to load
-# Robust check to prevent KeyError
+    st.stop()
 
 if raw_data is None or len(raw_data) == 0:
     st.info("Loading data from database...")
-    st.stop() # Wait for data before continuing
+    st.stop()
 
 # Process Data safely
 try:
@@ -138,7 +152,6 @@ try:
                   "Country": e.get("country")} for e in raw_data]
     df = pd.DataFrame(flat_data)
     
-    # Double-check that columns exist before proceeding
     if "Player" not in df.columns:
         st.error("Data structure mismatch. Please check your Supabase table schema.")
         st.stop()
@@ -152,12 +165,14 @@ for entry in raw_results:
     r = str(entry['round']).upper()
     results_map.setdefault(r, []).append(entry['country'])
 
+# --- PROCESS GLOBAL ELIMINATIONS DICTIONARY ---
+elim_map = {str(e['country']).lower().strip(): str(e['eliminated_at_stage']).upper().strip() for e in raw_eliminated} if raw_eliminated else {}
+
 # 6. Sidebar
 st.sidebar.markdown("### 👤 Player Details")
 player_list = sorted(df["Player"].unique())
 selected_player = st.sidebar.selectbox("Select Player", player_list)
 
-# Add Total Player count
 st.sidebar.markdown(f"**Total Players:** {len(player_list)}")
 
 
@@ -171,20 +186,16 @@ if selected_player:
     all_stages = ['R32', 'R16', 'QF', 'SF', 'FOURTH', 'THIRD', 'RUNNERUP', 'CHAMPION']
     
     for stage in all_stages:
-        stage_upper = stage.upper()
+        stage_upper = stage.upper().strip()
         preds_in_stage = player_preds[player_preds['Round'].str.upper() == stage_upper]
         countries = preds_in_stage['Country'].tolist()
         
-# Use this for both Section 7 and Section 8
-# Because you now have real SF data, we stop looking at QF for SF points
         lookup_round = stage_upper
         actuals = [c.lower() for c in results_map.get(lookup_round, [])]        
         
-        # Ensure we are using the exact same uppercase key for lookup
         stage_key = stage.upper()
         
-        # Calculate points
-        # We look up the country in 'actuals' and add the points defined in POINTS_MAP
+        # Calculate points safely (solely uses actuals results data)
         stage_points = sum(POINTS_MAP.get(stage_key, 0) for c in countries if c.lower() in actuals)
         total_score += stage_points
         
@@ -192,15 +203,36 @@ if selected_player:
         
         if countries:
             has_actuals = len(actuals) > 0
+            stage_order = ['R32', 'R16', 'QF', 'SF', 'FOURTH', 'THIRD', 'RUNNERUP', 'CHAMPION']
             
-            # Display boxes (always show them, highlight if correct)
-            box_html = "".join([
-                f'<div class="country-box {"correct" if (has_actuals and c.lower() in actuals) else ""}">{c}</div>' 
-                for c in countries
-            ])
+            box_html = ""
+            for c in countries:
+                c_lower = c.lower().strip()
+                status_class = ""
+                
+                # 1. Check if the team successfully advanced in this round (Green)
+                if has_actuals and c_lower in actuals:
+                    status_class = "correct"
+                
+                # 2. Check if the team was eliminated chronologically before or during this round (Red)
+                elif c_lower in elim_map:
+                    stage_failed = elim_map[c_lower]
+                    
+                    try:
+                        current_stage_idx = stage_order.index(stage_upper)
+                        failed_stage_idx = stage_order.index(stage_failed)
+                        
+                        # Turn RED if current stage column position is equal to or past failure point
+                        if current_stage_idx >= failed_stage_idx:
+                            status_class = "failed"
+                    except ValueError:
+                        # Fallback case protection
+                        status_class = "failed"
+                
+                box_html += f'<div class="country-box {status_class}">{c}</div>'
+            
             st.markdown(f'<div style="text-align: center;">{box_html}</div>', unsafe_allow_html=True)
             
-            # UPDATED: Added podium stages to the balance logic
             if has_actuals:
                 picked_lower = [c.lower() for c in countries]
                 balance = [c for c in actuals if c not in picked_lower]
@@ -232,46 +264,34 @@ for player in player_list:
         r = str(row['Round']).upper()
         c = str(row['Country']).lower()
         
-        # Determine the round to look up (if you have SF data, just look up 'SF')
         lookup_round = r
-        
-        # Get the actual results for this specific round
         actuals = [x.lower() for x in results_map.get(lookup_round, [])]
         
-        # If the predicted country is in the actual results for that round, add points
         if c in actuals:
             total_points += POINTS_MAP.get(r, 0)
                 
     leaderboard.append({"Player": player, "Total Points": total_points})
 
-# Create and display the table
 df_leaderboard = pd.DataFrame(leaderboard).sort_values(by="Total Points", ascending=False).reset_index(drop=True)
 
-# Limit to top 5 players
-df_leaderboard_top5 = df_leaderboard.head(8)
+df_leaderboard_top5 = df_leaderboard.head(5)
 st.table(df_leaderboard_top5)
-# st.table(df_leaderboard)
 
 # --- Additional Insights ---
 def get_most_guessed(round_name):
     round_data = df[df["Round"].str.upper() == round_name.upper()]
     if not round_data.empty:
-        # Get count of each country
         counts = round_data["Country"].value_counts()
-        
-        # Get the top 2 rows
         top_2 = counts.head(3)
-        
-        # Format as "Country1 (Count), Country2 (Count)"
         results = [f"{country} ({count})" for country, count in top_2.items()]
         return "<br>".join(results)
     return "No data"
     
+st.header("📊 Popular Picks")
+
 with st.container(border=True):
-    st.markdown("### 📊 Popular Picks")
     col1, col2, col3, col4 = st.columns(4)
     
-    # We use st.markdown instead of st.metric to allow the HTML line breaks
     with col1:
         st.markdown(f"**Champion**<br>{get_most_guessed('CHAMPION')}", unsafe_allow_html=True)
     with col2:

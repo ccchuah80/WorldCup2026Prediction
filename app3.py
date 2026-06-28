@@ -66,6 +66,12 @@ st.markdown("""
     .failed { background-color: #d9534f !important; border-color: #d91111 !important; color: #ffccff !important; }
     
     .stMarkdown p { margin: 2px 0 !important; }
+
+    /* Target the second column (Total Points) header and data cells to center them */
+    thead tr th:nth-child(2), 
+    tbody tr td:nth-child(2) {
+        text-align: center !important;
+    }
     
     h3 { margin-bottom: 2px !important; padding-bottom: 0px !important; color: black !important; }
     
@@ -272,7 +278,11 @@ for player in player_list:
                 
     leaderboard.append({"Player": player, "Total Points": total_points})
 
-df_leaderboard = pd.DataFrame(leaderboard).sort_values(by="Total Points", ascending=False).reset_index(drop=True)
+# Sort primarily by Total Points (highest first), then by Player name (alphabetically A-Z)
+df_leaderboard = pd.DataFrame(leaderboard).sort_values(
+    by=["Total Points", "Player"], 
+    ascending=[False, True]
+).reset_index(drop=True)
 
 df_leaderboard_top5 = df_leaderboard.head(8)
 st.table(df_leaderboard_top5)

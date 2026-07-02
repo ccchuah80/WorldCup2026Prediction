@@ -297,8 +297,27 @@ def get_most_guessed(round_name):
         return "<br>".join(results)
     return "No data"
     
-st.header("📊 Popular Picks")
+if st.button("Refresh Data"):
+    st.cache_data.clear()
+    st.rerun()
 
+st.header("🏆 Knock Out Bracket (Unoffical)")
+# Place your Flourish script block into a multi-line Python string
+flourish_script_code = """
+<div class="flourish-embed flourish-tournament" data-src="visualisation/29572361">
+    <script src="https://public.flourish.studio/resources/embed.js"></script>
+    <noscript>
+        <img src="https://public.flourish.studio/visualisation/29572361/thumbnail" width="100%" alt="tournament visualization" />
+    </noscript>
+</div>
+"""
+
+st.iframe(
+    src=flourish_script_code, 
+    height=650
+)
+
+st.header("📊 Popular Picks")
 with st.container(border=True):
     col1, col2, col3, col4 = st.columns(4)
     
@@ -312,7 +331,3 @@ with st.container(border=True):
         st.markdown(f"**Quarter-Finalist**<br>{get_most_guessed('QF')}", unsafe_allow_html=True)
         
 st.markdown('</div>', unsafe_allow_html=True)
-
-if st.button("Refresh Data"):
-    st.cache_data.clear()
-    st.rerun()

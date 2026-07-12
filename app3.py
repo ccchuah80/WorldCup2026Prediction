@@ -318,7 +318,7 @@ st.iframe(
 )
 
 # 9. Podiums Selections Table (Replacing Popular Picks)
-st.header("⚽️ Finals Podiums Selections")
+st.header("Finals Podiums Selections")
 
 # Define stages for matching
 final_stages = ['CHAMPION', 'RUNNERUP', 'THIRD', 'FOURTH']
@@ -328,19 +328,20 @@ stage_order = ['R32', 'R16', 'QF', 'SF', 'FOURTH', 'THIRD', 'RUNNERUP', 'CHAMPIO
 df_finals = df.copy()
 df_finals["Round"] = df_finals["Round"].str.upper().str.strip()
 
-# Build custom compact HTML table with Player on the left
+# Build custom compact HTML table utilizing stTable container styling for matching widths
 table_html = """
-<table style="width:100%; border-collapse: collapse; background-color: #faffb3; border-radius: 10px; overflow: hidden; font-size: 0.85em;">
-    <thead>
-        <tr style="background-color: #f0f2f6;">
-            <th style="padding: 6px; text-align: left; width: 20%; color: #333; font-weight: bold;">Player</th>
-            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">1st</th>
-            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">2nd</th>
-            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">3rd</th>
-            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">4th</th>
-        </tr>
-    </thead>
-    <tbody>
+<div data-testid="stTable">
+    <table style="width: 100%; border-collapse: collapse; overflow: hidden; font-size: 0.85em;">
+        <thead>
+            <tr style="background-color: #f0f2f6;">
+                <th style="padding: 8px 20px; text-align: left; color: #333; font-weight: bold;">Player</th>
+                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">1st</th>
+                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">2nd</th>
+                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">3rd</th>
+                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">4th</th>
+            </tr>
+        </thead>
+        <tbody>
 """
 
 for player in player_list:
@@ -348,7 +349,7 @@ for player in player_list:
     table_html += "<tr>"
     
     # Prepend the Player name on the left side
-    table_html += f'<td style="padding: 4px 10px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black;">{player}</td>'
+    table_html += f'<td style="padding: 6px 20px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black;">{player}</td>'
     
     # Render the 4 compact choice cells (Champ, RunnerUp, 3rd, 4th)
     for stage_key in final_stages:
@@ -380,13 +381,13 @@ for player in player_list:
         else:
             cell_html = '<span style="color: #999;">-</span>'
             
-        table_html += f'<td style="padding: 4px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{cell_html}</td>'
+        table_html += f'<td style="padding: 6px 5px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{cell_html}</td>'
     
     table_html += "</tr>"
 
-table_html += "</tbody></table>"
+table_html += "</tbody></table></div>"
 
-# Render the layout
+# Render the perfectly width-matched layout
 st.markdown(table_html, unsafe_allow_html=True)
 
 # st.header("📊 Popular Picks")

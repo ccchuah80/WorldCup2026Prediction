@@ -317,17 +317,89 @@ st.iframe(
     height=650
 )
 
-st.header("📊 Popular Picks")
-with st.container(border=True):
-    col1, col2, col3, col4 = st.columns(4)
+# 9. Podiums Selections Table (Replacing Popular Picks)
+st.header("⚽️ Finals Podiums Selections")
+
+# Define stages for matching
+final_stages = ['CHAMPION', 'RUNNERUP', 'THIRD', 'FOURTH']
+stage_order = ['R32', 'R16', 'QF', 'SF', 'FOURTH', 'THIRD', 'RUNNERUP', 'CHAMPION']
+
+# Normalize data for strict uppercase matching
+df_finals = df.copy()
+df_finals["Round"] = df_finals["Round"].str.upper().str.strip()
+
+# Build custom compact HTML table with Player on the left
+table_html = """
+<table style="width:100%; border-collapse: collapse; background-color: #faffb3; border-radius: 10px; overflow: hidden; font-size: 0.85em;">
+    <thead>
+        <tr style="background-color: #f0f2f6;">
+            <th style="padding: 6px; text-align: left; width: 20%; color: #333; font-weight: bold;">Player</th>
+            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">1st</th>
+            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">2nd</th>
+            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">3rd</th>
+            <th style="padding: 6px; text-align: center; width: 20%; color: #333; font-weight: bold;">4th</th>
+        </tr>
+    </thead>
+    <tbody>
+"""
+
+for player in player_list:
+    player_preds = df_finals[df_finals["Player"] == player]
+    table_html += "<tr>"
     
-    with col1:
-        st.markdown(f"**Champion**<br>{get_most_guessed('CHAMPION')}", unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"**RunnerUp**<br>{get_most_guessed('RUNNERUP')}", unsafe_allow_html=True)
-    with col3:
-        st.markdown(f"**Semi-Finalist**<br>{get_most_guessed('SF')}", unsafe_allow_html=True)
-    with col4:
-        st.markdown(f"**Quarter-Finalist**<br>{get_most_guessed('QF')}", unsafe_allow_html=True)
+    # Prepend the Player name on the left side
+    table_html += f'<td style="padding: 4px 10px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black;">{player}</td>'
+    
+    # Render the 4 compact choice cells (Champ, RunnerUp, 3rd, 4th)
+    for stage_key in final_stages:
+        preds_in_stage = player_preds[player_preds['Round'] == stage_key]
+        countries = preds_in_stage['Country'].tolist()
         
-st.markdown('</div>', unsafe_allow_html=True)
+        actuals = [c.lower() for c in results_map.get(stage_key, [])]
+        has_actuals = len(actuals) > 0
+        
+        cell_html = ""
+        if countries:
+            for c in countries:
+                c_lower = c.lower().strip()
+                status_class = ""
+                
+                if has_actuals and c_lower in actuals:
+                    status_class = "correct"
+                elif c_lower in elim_map:
+                    stage_failed = elim_map[c_lower]
+                    try:
+                        current_stage_idx = stage_order.index(stage_key)
+                        failed_stage_idx = stage_order.index(stage_failed)
+                        if current_stage_idx >= failed_stage_idx:
+                            status_class = "failed"
+                    except ValueError:
+                        status_class = "failed"
+                
+                cell_html += f'<div class="country-box {status_class}" style="min-width: 65px; font-size: 0.85em; margin: 1px; padding: 1px 3px;">{c}</div>'
+        else:
+            cell_html = '<span style="color: #999;">-</span>'
+            
+        table_html += f'<td style="padding: 4px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{cell_html}</td>'
+    
+    table_html += "</tr>"
+
+table_html += "</tbody></table>"
+
+# Render the layout
+st.markdown(table_html, unsafe_allow_html=True)
+
+# st.header("📊 Popular Picks")
+# with st.container(border=True):
+#    col1, col2, col3, col4 = st.columns(4)
+#    
+#    with col1:
+#        st.markdown(f"**Champion**<br>{get_most_guessed('CHAMPION')}", unsafe_allow_html=True)
+#    with col2:
+#        st.markdown(f"**RunnerUp**<br>{get_most_guessed('RUNNERUP')}", unsafe_allow_html=True)
+#    with col3:
+#        st.markdown(f"**Semi-Finalist**<br>{get_most_guessed('SF')}", unsafe_allow_html=True)
+#    with col4:
+#        st.markdown(f"**Quarter-Finalist**<br>{get_most_guessed('QF')}", unsafe_allow_html=True)
+#        
+#st.markdown('</div>', unsafe_allow_html=True)

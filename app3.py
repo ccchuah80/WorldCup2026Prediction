@@ -318,7 +318,7 @@ st.iframe(
 )
 
 # 9. Podiums Selections Table (Replacing Popular Picks)
-st.header("Finals Podiums Selections")
+st.header("⚽️ Finals Podiums")
 
 # Define stages for matching
 final_stages = ['CHAMPION', 'RUNNERUP', 'THIRD', 'FOURTH']
@@ -335,8 +335,8 @@ table_html = """
         <table style="width: 100%; min-width: 320px; border-collapse: collapse; overflow: hidden; font-size: 0.85em;">
             <thead>
                 <tr style="background-color: #f0f2f6;">
-                    <th style="padding: 6px 4px; text-align: left; color: #333; font-weight: bold; width: 30%;">Player</th>
-                    <th style="padding: 6px 10px; text-align: center; color: #333; font-weight: bold; width: 70%;">Predictions (1st - 4th)</th>
+                    <th style="padding: 2px 4px; text-align: left; color: #333; font-weight: bold; width: 30%;">Player</th>
+                    <th style="padding: 2px 4px; text-align: center; color: #333; font-weight: bold; width: 70%;">Predictions (1st - 4th)</th>
                 </tr>
             </thead>
             <tbody>
@@ -347,10 +347,10 @@ for player in player_list:
     table_html += "<tr>"
     
     # Player column on the left
-    table_html += f'<td style="padding: 6px 14px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black; white-space: nowrap;">{player}</td>'
+    table_html += f'<td style="padding: 2px 0px; text-align: left; background-color: #ffffff; border-bottom: 1px solid #eee; color: black; white-space: nowrap;">{player}</td>'
     
     # Single merged column for all 4 placements
-    merged_cells_html = '<div style="display: flex; gap: 2px; flex-wrap: nowrap;">'
+    merged_cells_html = '<div style="display: flex; gap: 2px; flex-wrap: nowrap; justify-content: center;">'
     
     for stage_key in final_stages:
         preds_in_stage = player_preds[player_preds['Round'] == stage_key]
@@ -376,13 +376,13 @@ for player in player_list:
                     except ValueError:
                         status_class = "failed"
                 
-                merged_cells_html += f'<div class="country-box {status_class}" style="min-width: 70px; font-size: 0.82em; margin: 0; padding: 1px 8px;">{c}</div>'
+                merged_cells_html += f'<div class="country-box {status_class}" style="min-width: 70px; font-size: 0.82em; margin: 0; padding: 1px 0px;">{c}</div>'
         else:
-            merged_cells_html += '<div class="country-box" style="min-width: 60px; font-size: 0.82em; margin: 0; padding: 1px 8px; color: #999;">-</div>'
+            merged_cells_html += '<div class="country-box" style="min-width: 70px; font-size: 0.82em; margin: 0; padding: 1px 2px; color: #999;">-</div>'
             
     merged_cells_html += '</div>'
     
-    table_html += f'<td style="padding: 6px 10px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{merged_cells_html}</td>'
+    table_html += f'<td style="padding: 6px 0px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{merged_cells_html}</td>'
     table_html += "</tr>"
 
 table_html += "</tbody></table></div></div>"

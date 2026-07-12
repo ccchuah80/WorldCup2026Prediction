@@ -328,28 +328,29 @@ stage_order = ['R32', 'R16', 'QF', 'SF', 'FOURTH', 'THIRD', 'RUNNERUP', 'CHAMPIO
 df_finals = df.copy()
 df_finals["Round"] = df_finals["Round"].str.upper().str.strip()
 
-# Build custom compact HTML table utilizing stTable container styling for matching widths
+# Build custom compact HTML table utilizing stTable container styling with minimum left/right padding
 table_html = """
 <div data-testid="stTable">
-    <table style="width: 100%; border-collapse: collapse; overflow: hidden; font-size: 0.85em;">
-        <thead>
-            <tr style="background-color: #f0f2f6;">
-                <th style="padding: 8px 20px; text-align: left; color: #333; font-weight: bold;">Player</th>
-                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">1st</th>
-                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">2nd</th>
-                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">3rd</th>
-                <th style="padding: 8px 5px; text-align: center; color: #333; font-weight: bold;">4th</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+        <table style="width: 100%; min-width: 450px; border-collapse: collapse; overflow: hidden; font-size: 0.85em;">
+            <thead>
+                <tr style="background-color: #f0f2f6;">
+                    <th style="padding: 6px 4px; text-align: left; color: #333; font-weight: bold;">Player</th>
+                    <th style="padding: 6px 2px; text-align: center; color: #333; font-weight: bold;">1st</th>
+                    <th style="padding: 6px 2px; text-align: center; color: #333; font-weight: bold;">2nd</th>
+                    <th style="padding: 6px 2px; text-align: center; color: #333; font-weight: bold;">3rd</th>
+                    <th style="padding: 6px 2px; text-align: center; color: #333; font-weight: bold;">4th</th>
+                </tr>
+            </thead>
+            <tbody>
 """
 
 for player in player_list:
     player_preds = df_finals[df_finals["Player"] == player]
     table_html += "<tr>"
     
-    # Prepend the Player name on the left side
-    table_html += f'<td style="padding: 6px 20px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black;">{player}</td>'
+    # Prepend the Player name on the left side with small padding
+    table_html += f'<td style="padding: 6px 4px; text-align: left; font-weight: bold; background-color: #ffffff; border-bottom: 1px solid #eee; color: black; white-space: nowrap;">{player}</td>'
     
     # Render the 4 compact choice cells (Champ, RunnerUp, 3rd, 4th)
     for stage_key in final_stages:
@@ -377,17 +378,17 @@ for player in player_list:
                     except ValueError:
                         status_class = "failed"
                 
-                cell_html += f'<div class="country-box {status_class}" style="min-width: 65px; font-size: 0.85em; margin: 1px; padding: 1px 3px;">{c}</div>'
+                cell_html += f'<div class="country-box {status_class}" style="min-width: 60px; font-size: 0.82em; margin: 1px; padding: 1px 2px;">{c}</div>'
         else:
             cell_html = '<span style="color: #999;">-</span>'
             
-        table_html += f'<td style="padding: 6px 5px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{cell_html}</td>'
+        table_html += f'<td style="padding: 6px 2px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #eee;">{cell_html}</td>'
     
     table_html += "</tr>"
 
-table_html += "</tbody></table></div>"
+table_html += "</tbody></table></div></div>"
 
-# Render the perfectly width-matched layout
+# Render the layout
 st.markdown(table_html, unsafe_allow_html=True)
 
 # st.header("📊 Popular Picks")

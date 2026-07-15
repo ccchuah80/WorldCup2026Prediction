@@ -220,22 +220,29 @@ if selected_player:
                 if has_actuals and c_lower in actuals:
                     status_class = "correct"
                 
-                # --- DYNAMIC SEMI-FINAL OUTCOME LIVE OVERRIDES ---
-                # 1. Spain won the SF -> Cannot be 3rd or 4th
-                elif c_lower == 'spain' and stage_upper in ['THIRD', 'FOURTH']:
-                    status_class = "failed"
-                
-                # 2. France lost the SF -> Cannot be Champion or RunnerUp
-                elif c_lower == 'france' and stage_upper in ['CHAMPION', 'RUNNERUP']:
-                    status_class = "failed"
-                
-                # 3. Check if the team was eliminated chronologically before or during this round (Red)
+                # --- AUTOMATED SEMI-FINAL LIVE OVERRIDES ---
                 elif c_lower in elim_map:
                     stage_failed = elim_map[c_lower]
                     
-                    # Finalist safety filter (preventing finalists from turning red in 3rd/4th boxes)
-                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_upper in ['THIRD', 'FOURTH']:
-                        status_class = "" 
+                    # A) Dynamic check for SF Winners (Marked as FINALIST in DB) -> Red in 3rd or 4th
+                    if stage_failed == 'FINALIST':
+                        if stage_upper in ['THIRD', 'FOURTH']:
+                            status_class = "failed"
+                        else:
+                            status_class = ""  # Keep clean for Champion/RunnerUp
+                        
+                    # B) Dynamic check for SF Losers (Marked as PLAYOFF in DB) -> Red in Champ or RunnerUp
+                    elif stage_failed == 'PLAYOFF':
+                        if stage_upper in ['CHAMPION', 'RUNNERUP']:
+                            status_class = "failed"
+                        else:
+                            status_class = ""  # Keep clean for 3rd/4th
+                        
+                    # C) Finalist protection once the final matches are over (for CHAMPION or RUNNERUP tags)
+                    elif stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_upper in ['THIRD', 'FOURTH']:
+                        status_class = ""
+                        
+                    # D) Standard chronological elimination check
                     else:
                         try:
                             current_stage_idx = stage_order.index(stage_upper)
@@ -243,7 +250,8 @@ if selected_player:
                             if current_stage_idx >= failed_stage_idx:
                                 status_class = "failed"
                         except ValueError:
-                            status_class = "failed"
+                            # If it's an unrecognized stage, don't default blindly to red
+                            status_class = ""
                 
                 # 2. Check if the team was eliminated chronologically before or during this round (Red)
                 elif c_lower in elim_map:
@@ -400,16 +408,23 @@ for player in player_list:
                 if has_actuals and c_lower in actuals:
                     status_class = "correct"
                 
-                # --- DYNAMIC SEMI-FINAL OUTCOME LIVE OVERRIDES ---
-                elif c_lower == 'spain' and stage_key in ['THIRD', 'FOURTH']:
-                    status_class = "failed"
-                
-                elif c_lower == 'france' and stage_key in ['CHAMPION', 'RUNNERUP']:
-                    status_class = "failed"
-                
+                # --- AUTOMATED SEMI-FINAL LIVE OVERRIDES ---
                 elif c_lower in elim_map:
                     stage_failed = elim_map[c_lower]
-                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_key in ['THIRD', 'FOURTH']:
+                    
+                    if stage_failed == 'FINALIST':
+                        if stage_key in ['THIRD', 'FOURTH']:
+                            status_class = "failed"
+                        else:
+                            status_class = ""
+                            
+                    elif stage_failed == 'PLAYOFF':
+                        if stage_key in ['CHAMPION', 'RUNNERUP']:
+                            status_class = "failed"
+                        else:
+                            status_class = ""
+                            
+                    elif stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_key in ['THIRD', 'FOURTH']:
                         status_class = ""
                     else:
                         try:
@@ -418,23 +433,7 @@ for player in player_list:
                             if current_stage_idx >= failed_stage_idx:
                                 status_class = "failed"
                         except ValueError:
-                            status_class = "failed"
-                                
-                elif c_lower in elim_map:
-                    stage_failed = elim_map[c_lower]
-                    
-                    # --- FIX FOR FINALS OVERRIDE ---
-                    # If a team reached the Finals (Champion/RunnerUp), they shouldn't turn RED in 3rd/4th place picks
-                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_key in ['THIRD', 'FOURTH']:
-                        status_class = "" # Excuse them; leave them default/blank
-                    else:
-                        try:
-                            current_stage_idx = stage_order.index(stage_key)
-                            failed_stage_idx = stage_order.index(stage_failed)
-                            if current_stage_idx >= failed_stage_idx:
-                                status_class = "failed"
-                        except ValueError:
-                            status_class = "failed"
+                            status_class = ""
                 
                 merged_cells_html += f'<div class="country-box {status_class}" style="min-width: 70px; font-size: 0.82em; margin: 0; padding: 1px 0px;">{c}</div>'
         else:

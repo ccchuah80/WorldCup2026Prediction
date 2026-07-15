@@ -323,7 +323,7 @@ df_leaderboard = pd.DataFrame(leaderboard).sort_values(
     ascending=[False, True]
 ).reset_index(drop=True)
 
-df_leaderboard_top5 = df_leaderboard.head(17)
+df_leaderboard_top5 = df_leaderboard.head(8)
 st.table(df_leaderboard_top5)
 
 # --- Additional Insights ---

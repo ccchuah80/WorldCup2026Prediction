@@ -220,20 +220,50 @@ if selected_player:
                 if has_actuals and c_lower in actuals:
                     status_class = "correct"
                 
+                # --- DYNAMIC SEMI-FINAL OUTCOME LIVE OVERRIDES ---
+                # 1. Spain won the SF -> Cannot be 3rd or 4th
+                elif c_lower == 'spain' and stage_upper in ['THIRD', 'FOURTH']:
+                    status_class = "failed"
+                
+                # 2. France lost the SF -> Cannot be Champion or RunnerUp
+                elif c_lower == 'france' and stage_upper in ['CHAMPION', 'RUNNERUP']:
+                    status_class = "failed"
+                
+                # 3. Check if the team was eliminated chronologically before or during this round (Red)
+                elif c_lower in elim_map:
+                    stage_failed = elim_map[c_lower]
+                    
+                    # Finalist safety filter (preventing finalists from turning red in 3rd/4th boxes)
+                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_upper in ['THIRD', 'FOURTH']:
+                        status_class = "" 
+                    else:
+                        try:
+                            current_stage_idx = stage_order.index(stage_upper)
+                            failed_stage_idx = stage_order.index(stage_failed)
+                            if current_stage_idx >= failed_stage_idx:
+                                status_class = "failed"
+                        except ValueError:
+                            status_class = "failed"
+                
                 # 2. Check if the team was eliminated chronologically before or during this round (Red)
                 elif c_lower in elim_map:
                     stage_failed = elim_map[c_lower]
                     
-                    try:
-                        current_stage_idx = stage_order.index(stage_upper)
-                        failed_stage_idx = stage_order.index(stage_failed)
-                        
-                        # Turn RED if current stage column position is equal to or past failure point
-                        if current_stage_idx >= failed_stage_idx:
+                    # --- FIX FOR FINALS OVERRIDE ---
+                    # If a team reached the Finals (Champion/RunnerUp), they shouldn't turn RED in 3rd/4th place picks
+                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_upper in ['THIRD', 'FOURTH']:
+                        status_class = "" # Excuse them; leave them default/blank
+                    else:
+                        try:
+                            current_stage_idx = stage_order.index(stage_upper)
+                            failed_stage_idx = stage_order.index(stage_failed)
+                            
+                            # Turn RED if current stage column position is equal to or past failure point
+                            if current_stage_idx >= failed_stage_idx:
+                                status_class = "failed"
+                        except ValueError:
+                            # Fallback case protection
                             status_class = "failed"
-                    except ValueError:
-                        # Fallback case protection
-                        status_class = "failed"
                 
                 box_html += f'<div class="country-box {status_class}">{c}</div>'
             
@@ -278,13 +308,14 @@ for player in player_list:
                 
     leaderboard.append({"Player": player, "Total Points": total_points})
 
+# df_leaderboard = pd.DataFrame(leaderboard).sort_values(by="Total Points", ascending=False).reset_index(drop=True)
 # Sort primarily by Total Points (highest first), then by Player name (alphabetically A-Z)
 df_leaderboard = pd.DataFrame(leaderboard).sort_values(
     by=["Total Points", "Player"], 
     ascending=[False, True]
 ).reset_index(drop=True)
 
-df_leaderboard_top5 = df_leaderboard.head(8)
+df_leaderboard_top5 = df_leaderboard.head(17)
 st.table(df_leaderboard_top5)
 
 # --- Additional Insights ---
@@ -297,6 +328,8 @@ def get_most_guessed(round_name):
         return "<br>".join(results)
     return "No data"
     
+
+
 if st.button("Refresh Data"):
     st.cache_data.clear()
     st.rerun()
@@ -366,15 +399,42 @@ for player in player_list:
                 
                 if has_actuals and c_lower in actuals:
                     status_class = "correct"
+                
+                # --- DYNAMIC SEMI-FINAL OUTCOME LIVE OVERRIDES ---
+                elif c_lower == 'spain' and stage_key in ['THIRD', 'FOURTH']:
+                    status_class = "failed"
+                
+                elif c_lower == 'france' and stage_key in ['CHAMPION', 'RUNNERUP']:
+                    status_class = "failed"
+                
                 elif c_lower in elim_map:
                     stage_failed = elim_map[c_lower]
-                    try:
-                        current_stage_idx = stage_order.index(stage_key)
-                        failed_stage_idx = stage_order.index(stage_failed)
-                        if current_stage_idx >= failed_stage_idx:
+                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_key in ['THIRD', 'FOURTH']:
+                        status_class = ""
+                    else:
+                        try:
+                            current_stage_idx = stage_order.index(stage_key)
+                            failed_stage_idx = stage_order.index(stage_failed)
+                            if current_stage_idx >= failed_stage_idx:
+                                status_class = "failed"
+                        except ValueError:
                             status_class = "failed"
-                    except ValueError:
-                        status_class = "failed"
+                                
+                elif c_lower in elim_map:
+                    stage_failed = elim_map[c_lower]
+                    
+                    # --- FIX FOR FINALS OVERRIDE ---
+                    # If a team reached the Finals (Champion/RunnerUp), they shouldn't turn RED in 3rd/4th place picks
+                    if stage_failed in ['RUNNERUP', 'CHAMPION'] and stage_key in ['THIRD', 'FOURTH']:
+                        status_class = "" # Excuse them; leave them default/blank
+                    else:
+                        try:
+                            current_stage_idx = stage_order.index(stage_key)
+                            failed_stage_idx = stage_order.index(stage_failed)
+                            if current_stage_idx >= failed_stage_idx:
+                                status_class = "failed"
+                        except ValueError:
+                            status_class = "failed"
                 
                 merged_cells_html += f'<div class="country-box {status_class}" style="min-width: 70px; font-size: 0.82em; margin: 0; padding: 1px 0px;">{c}</div>'
         else:
@@ -389,18 +449,3 @@ table_html += "</tbody></table></div></div>"
 
 # Render the layout
 st.markdown(table_html, unsafe_allow_html=True)
-
-# st.header("📊 Popular Picks")
-# with st.container(border=True):
-#    col1, col2, col3, col4 = st.columns(4)
-#    
-#    with col1:
-#        st.markdown(f"**Champion**<br>{get_most_guessed('CHAMPION')}", unsafe_allow_html=True)
-#    with col2:
-#        st.markdown(f"**RunnerUp**<br>{get_most_guessed('RUNNERUP')}", unsafe_allow_html=True)
-#    with col3:
-#        st.markdown(f"**Semi-Finalist**<br>{get_most_guessed('SF')}", unsafe_allow_html=True)
-#    with col4:
-#        st.markdown(f"**Quarter-Finalist**<br>{get_most_guessed('QF')}", unsafe_allow_html=True)
-#        
-#st.markdown('</div>', unsafe_allow_html=True)
